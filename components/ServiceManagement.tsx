@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Service } from '../types';
 import { InsforgeService } from '../services/insforgeService';
 
@@ -12,13 +12,26 @@ const ServiceManagement: React.FC = () => {
   const [filter, setFilter] = useState('Todos');
   const [selectedService, setSelectedService] = useState<Service | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewService(prev => ({ ...prev, image: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   const [newService, setNewService] = useState<Partial<Service>>({
     name: '',
     duration: 30,
     price: 0,
     category: 'Peluquería',
-    description: ''
+    description: '',
+    image: ''
   });
 
   const categories = [
@@ -113,7 +126,7 @@ const ServiceManagement: React.FC = () => {
         }
       }
       setIsAdding(false);
-      setNewService({ name: '', duration: 30, price: 0, category: 'Peluquería', description: '' });
+      setNewService({ name: '', duration: 30, price: 0, category: 'Peluquería', description: '', image: '' });
     } catch (err) {
       console.error('Error saving service:', err);
       setError('No se pudo guardar el servicio. Intenta de nuevo.');
@@ -270,7 +283,25 @@ const ServiceManagement: React.FC = () => {
             <h2 className="text-3xl font-display font-bold mb-8" style={{ color: 'var(--color-text)' }}>
               {newService.id ? 'Editar Servicio' : 'Nuevo Servicio'}
             </h2>
-            <div className="space-y-5">
+            <div className="space-y-5 max-h-[60vh] overflow-y-auto px-1 custom-scrollbar">
+              <div className="flex flex-col gap-2 mb-2">
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-primary">Foto del Servicio</label>
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full h-40 rounded-2xl border-2 border-dashed hover:border-primary transition-all cursor-pointer flex flex-col items-center justify-center overflow-hidden group relative"
+                  style={{ background: 'var(--color-bg)', borderColor: 'var(--color-border)' }}
+                >
+                  {newService.image ? (
+                    <img src={newService.image} className="w-full h-full object-cover" />
+                  ) : (
+                    <>
+                      <span className="material-symbols-outlined text-4xl group-hover:text-primary mb-2 transition-colors" style={{ color: 'var(--color-text-faint)' }}>add_a_photo</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest transition-colors group-hover:text-primary" style={{ color: 'var(--color-text-faint)' }}>Añadir imagen real</span>
+                    </>
+                  )}
+                </div>
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleImageUpload} />
+              </div>
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Nombre</label>
                 <input

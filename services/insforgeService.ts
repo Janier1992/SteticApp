@@ -192,7 +192,7 @@ export const InsforgeService = {
   async updateService(id: string, updates: Partial<Service>) {
     const { data, error } = await insforge.database
       .from('stetic_services')
-      .update({ name: updates.name, description: updates.description, price: updates.price, duration: updates.duration })
+      .update({ name: updates.name, description: updates.description, price: updates.price, duration: updates.duration, image_url: updates.image })
       .eq('id', id);
     if (error) throw error;
     return updates as any;
