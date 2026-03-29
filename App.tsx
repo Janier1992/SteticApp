@@ -8,6 +8,7 @@ import Auth from './components/Auth';
 import Landing from './components/Landing';
 import AIAssistant from './components/AIAssistant';
 import Onboarding from './components/Onboarding';
+import MobileActions from './components/MobileActions';
 
 // Lazy-loaded routes
 const Calendar = lazy(() => import('./components/Calendar'));
@@ -312,6 +313,7 @@ const App: React.FC = () => {
   return (
     <ThemeProvider>
       <div className="flex h-screen w-full overflow-hidden theme-transition" style={{ backgroundColor: 'var(--color-bg)', color: 'var(--color-text)' }}>
+        <MobileActions />
         {currentUser && !isFullPage && (
           <Sidebar currentUser={currentUser} activeTab={view} setActiveTab={setView as any} isCollapsed={isSidebarCollapsed} setIsCollapsed={setIsSidebarCollapsed} onLogout={() => setShowLogoutModal(true)} />
         )}

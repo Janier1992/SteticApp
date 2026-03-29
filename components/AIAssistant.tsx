@@ -65,7 +65,7 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ context, userRole }) => {
   ];
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end">
+    <div className="fixed bottom-[85px] right-4 md:bottom-8 md:right-8 z-[100] flex flex-col items-end">
       {isOpen && (
         <div className="w-[320px] md:w-[360px] h-[520px] bg-theme-surface backdrop-blur-3xl border border-theme shadow-float rounded-[2.5rem] mb-6 flex flex-col overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-500">
           {/* Header */}
@@ -197,10 +197,10 @@ const AIAssistant: React.FC<AIAssistantProps> = ({ context, userRole }) => {
       {/* Activator with Pulse */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`size-20 rounded-3xl shadow-float flex items-center justify-center text-white transition-all duration-500 hover:scale-110 active:scale-95 relative group overflow-hidden ${isOpen ? 'bg-red-500 rotate-90 shadow-red-500/30' : 'bg-primary animate-role-pulse'
+        className={`size-14 md:size-20 rounded-[1rem] md:rounded-3xl shadow-float flex items-center justify-center text-white transition-all duration-500 hover:scale-110 active:scale-95 relative group overflow-hidden ${isOpen ? 'bg-red-500 rotate-90 shadow-red-500/30' : 'bg-primary animate-role-pulse'
           }`}
       >
-        <span className="material-symbols-outlined font-black text-4xl relative z-10">
+        <span className="material-symbols-outlined font-black text-3xl md:text-4xl relative z-10">
           {isOpen ? 'close' : 'psychology'}
         </span>
         <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
