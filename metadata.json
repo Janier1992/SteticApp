@@ -1,0 +1,9 @@
+{
+  "name": "Stetic-App",
+  "description": "Comprehensive SaaS for aesthetic business management with integrated Gemini AI for business intelligence, appointment optimization, and personalized client care.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
