@@ -2,7 +2,15 @@ import { GoogleGenerativeAI, DynamicRetrievalMode } from "@google/generative-ai"
 import { Appointment } from "../types";
 
 // Helper to instantiate the client with the current environment key
-const createAIClient = () => new GoogleGenerativeAI(process.env.API_KEY || '');
+const getApiKey = () => {
+  try {
+    const b64 = import.meta.env.VITE_GEMINI_API_KEY_B64;
+    return b64 ? atob(b64) : '';
+  } catch {
+    return ''; // Evita crasheos si la variable no existe o no es un base64 válido
+  }
+};
+const createAIClient = () => new GoogleGenerativeAI(getApiKey());
 
 /**
  * Maestro Chat: Complex reasoning and multimodal image analysis using Gemini 1.5 Flash.
