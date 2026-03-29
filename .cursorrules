@@ -1,0 +1,8 @@
+# Stetic-App AI Assistant Rules
+
+## UI/UX Design Protocol
+When asked to create or modify any UI components, pages, layouts, or styling, you MUST:
+1. First review the capabilities inside the `.agent/skills/` directory (specifically the `ui-ux-pro-max` skill).
+2. Utilize the premium design system guidelines, color palettes, typography, and UX rules from that skill.
+3. Apply the 100 industry-specific reasoning rules to match the beauty/spa management domain of Stetic-App.
+4. Ensure all designs look modern, accessible, and polished, avoiding generic or unstyled layouts.
