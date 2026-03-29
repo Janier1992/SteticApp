@@ -5,9 +5,10 @@ import { AuthService, InsforgeService, ProfileService } from '../services/insfor
 interface AuthProps {
   onLogin: (user: { id: string; name: string; email: string; role: UserRole; businessId?: string; avatar?: string }) => void;
   initialRole?: UserRole;
+  onBack?: () => void;
 }
 
-const Auth: React.FC<AuthProps> = ({ onLogin, initialRole = UserRole.CLIENT }) => {
+const Auth: React.FC<AuthProps> = ({ onLogin, initialRole = UserRole.CLIENT, onBack }) => {
   const [isRegister, setIsRegister] = useState(false);
   const [selectedRole, setSelectedRole] = useState<UserRole>(initialRole);
   const [email, setEmail] = useState('');
@@ -174,6 +175,17 @@ const Auth: React.FC<AuthProps> = ({ onLogin, initialRole = UserRole.CLIENT }) =
         <div style={{ height: '4px', background: 'linear-gradient(90deg, var(--color-primary), var(--color-primary-light))' }} />
 
         <div className="p-10 md:p-12">
+          
+          {onBack && (
+            <button 
+              onClick={onBack} 
+              type="button"
+              className="absolute top-6 left-6 text-brand-text/50 hover:text-brand-text transition-colors flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest"
+            >
+              <span className="material-symbols-outlined text-sm">arrow_back</span>
+              Volver
+            </button>
+          )}
 
           {/* Header */}
           <div className="text-center mb-9">

@@ -58,6 +58,30 @@ const ServiceManagement: React.FC = () => {
     load();
   }, []);
 
+  const handleDelete = async () => {
+    if (!selectedService || !selectedService.id) return;
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este servicio? Esta acción no se puede deshacer.")) return;
+    setIsSaving(true);
+    try {
+      await InsforgeService.deleteService(selectedService.id);
+      setServices(prev => prev.filter(s => s.id !== selectedService?.id));
+      setSelectedService(null);
+    } catch (err) {
+      console.error('Error deleting service:', err);
+      setError('No se pudo eliminar el servicio. Intenta de nuevo.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const openEdit = () => {
+    if (selectedService) {
+      setNewService(selectedService);
+      setSelectedService(null);
+      setIsAdding(true);
+    }
+  };
+
   const handleAdd = async () => {
     if (!newService.name) return;
     setIsSaving(true);
@@ -66,18 +90,27 @@ const ServiceManagement: React.FC = () => {
       const businessId = businesses?.[0]?.id;
       if (!businessId) throw new Error('No se encontró ningún negocio.');
 
-      const saved = await InsforgeService.createService({ ...newService, businessId });
-      if (saved) {
-        setServices(prev => [{
-          id: saved.id,
-          businessId: saved.business_id,
-          name: saved.name,
-          description: saved.description || '',
-          price: saved.price,
-          duration: saved.duration,
-          category: saved.category || 'General',
-          image: saved.image_url || 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400',
-        }, ...prev]);
+      if (newService.id) {
+        // Edit mode
+        const updated = await InsforgeService.updateService(newService.id, { ...newService, businessId });
+        if (updated) {
+          setServices(prev => prev.map(s => s.id === updated.id ? { ...s, ...updated } : s));
+        }
+      } else {
+        // Create mode
+        const saved = await InsforgeService.createService({ ...newService, businessId });
+        if (saved) {
+          setServices(prev => [{
+            id: saved.id,
+            businessId: saved.business_id,
+            name: saved.name,
+            description: saved.description || '',
+            price: saved.price,
+            duration: saved.duration,
+            category: saved.category || 'General',
+            image: saved.image_url || 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?w=400',
+          }, ...prev]);
+        }
       }
       setIsAdding(false);
       setNewService({ name: '', duration: 30, price: 0, category: 'Peluquería', description: '' });
@@ -214,7 +247,17 @@ const ServiceManagement: React.FC = () => {
                 </div>
               </div>
 
-              <button onClick={() => setSelectedService(null)} className="btn-secondary w-full">Cerrar</button>
+              <div className="flex gap-4">
+                <button onClick={() => setSelectedService(null)} className="btn-secondary flex-1">Cerrar</button>
+                <button onClick={openEdit} className="btn-secondary flex-1 border-primary/20 text-primary hover:bg-primary/5">Editar</button>
+                <button onClick={handleDelete} className="w-12 h-12 flex items-center justify-center rounded-xl bg-red-50 text-red-500 hover:bg-red-100 transition-colors" disabled={isSaving}>
+                  {isSaving ? (
+                    <div className="size-4 border-2 border-red-500/40 border-t-red-500 rounded-full animate-spin"></div>
+                  ) : (
+                    <span className="material-symbols-outlined">delete</span>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -224,7 +267,9 @@ const ServiceManagement: React.FC = () => {
       {isAdding && (
         <div className="fixed inset-0 z-[150] flex items-center justify-center backdrop-blur-md p-6" style={{ background: 'var(--color-overlay)' }}>
           <div className="w-full max-w-xl rounded-3xl p-10 shadow-soft-xl border animate-in zoom-in-95 duration-300" style={{ background: 'var(--color-card)', borderColor: 'var(--color-border)' }}>
-            <h2 className="text-3xl font-display font-bold mb-8" style={{ color: 'var(--color-text)' }}>Nuevo Servicio</h2>
+            <h2 className="text-3xl font-display font-bold mb-8" style={{ color: 'var(--color-text)' }}>
+              {newService.id ? 'Editar Servicio' : 'Nuevo Servicio'}
+            </h2>
             <div className="space-y-5">
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-primary mb-2">Nombre</label>

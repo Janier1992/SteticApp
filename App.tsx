@@ -267,9 +267,9 @@ const App: React.FC = () => {
   const renderContent = () => {
     if (view === 'landing') return <Landing onExploreServices={() => setView('public-gallery')} onRegisterBusiness={() => { setAuthPreferredRole(UserRole.ADMIN); setView('auth'); }} onLogin={(role) => { setAuthPreferredRole(role); setView('auth'); }} />;
     if (view === 'public-gallery' && !currentUser) return <PublicGallery onBack={() => setView('landing')} onBookService={() => { setAuthPreferredRole(UserRole.CLIENT); setView('auth'); }} />;
-    if (view === 'auth') return <Auth onLogin={handleLogin} initialRole={authPreferredRole} />;
+    if (view === 'auth') return <Auth onLogin={handleLogin} initialRole={authPreferredRole} onBack={() => setView('landing')} />;
 
-    if (!currentUser) return <Auth onLogin={handleLogin} initialRole={UserRole.CLIENT} />;
+    if (!currentUser) return <Auth onLogin={handleLogin} initialRole={UserRole.CLIENT} onBack={() => setView('landing')} />;
 
     // ADMINISTRACIÓN
     if (currentUser.role === UserRole.ADMIN) {
