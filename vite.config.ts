@@ -5,6 +5,8 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
+  const basePath = process.env.GITHUB_PAGES ? '/SteticApp' : '';
+
   return {
     base: process.env.GITHUB_PAGES ? '/SteticApp/' : '/',
     server: {
@@ -33,13 +35,13 @@ export default defineConfig(({ mode }) => {
           start_url: process.env.GITHUB_PAGES ? '/SteticApp/' : '/',
           icons: [
             {
-              src: '/icons/icon-192x192.png',
+              src: `${basePath}/icons/icon-192x192.png`,
               sizes: '192x192',
               type: 'image/png',
               purpose: 'any maskable'
             },
             {
-              src: '/icons/icon-512x512.png',
+              src: `${basePath}/icons/icon-512x512.png`,
               sizes: '512x512',
               type: 'image/png'
             }
@@ -48,12 +50,12 @@ export default defineConfig(({ mode }) => {
             {
               name: 'Ver Agenda',
               url: process.env.GITHUB_PAGES ? '/SteticApp/business/calendar' : '/business/calendar',
-              icons: [{ src: '/icons/calendar.png', sizes: '192x192' }]
+              icons: [{ src: `${basePath}/icons/calendar.png`, sizes: '192x192' }]
             },
             {
               name: 'Mis Citas',
               url: process.env.GITHUB_PAGES ? '/SteticApp/client/appointments' : '/client/appointments',
-              icons: [{ src: '/icons/appointments.png', sizes: '192x192' }]
+              icons: [{ src: `${basePath}/icons/appointments.png`, sizes: '192x192' }]
             }
           ]
         },
