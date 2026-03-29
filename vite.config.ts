@@ -6,6 +6,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, '.', '');
   return {
+    base: process.env.GITHUB_PAGES ? '/SteticApp/' : '/',
     server: {
       port: 5173,
       host: '0.0.0.0',
@@ -29,7 +30,7 @@ export default defineConfig(({ mode }) => {
           background_color: '#F5F5F7',
           display: 'standalone',
           orientation: 'portrait',
-          start_url: '/',
+          start_url: process.env.GITHUB_PAGES ? '/SteticApp/' : '/',
           icons: [
             {
               src: '/icons/icon-192x192.png',
@@ -46,12 +47,12 @@ export default defineConfig(({ mode }) => {
           shortcuts: [
             {
               name: 'Ver Agenda',
-              url: '/business/calendar',
+              url: process.env.GITHUB_PAGES ? '/SteticApp/business/calendar' : '/business/calendar',
               icons: [{ src: '/icons/calendar.png', sizes: '192x192' }]
             },
             {
               name: 'Mis Citas',
-              url: '/client/appointments',
+              url: process.env.GITHUB_PAGES ? '/SteticApp/client/appointments' : '/client/appointments',
               icons: [{ src: '/icons/appointments.png', sizes: '192x192' }]
             }
           ]
