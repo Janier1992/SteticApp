@@ -16,6 +16,9 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
     breaks: []
   });
   const [phone, setPhone] = useState(business.phone || '');
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    business.notificationsEnabled ?? (localStorage.getItem(`stetic_admin_notifs_${business.id}`) === 'true')
+  );
 
   const [isSaving, setIsSaving] = useState(false);
   const [showBreakForm, setShowBreakForm] = useState(false);
@@ -51,7 +54,8 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
     setIsSaving(true);
     // Simulación de persistencia y actualización del estado global
     setTimeout(() => {
-      onSave({ ...business, schedule, phone });
+      localStorage.setItem(`stetic_admin_notifs_${business.id}`, notificationsEnabled.toString());
+      onSave({ ...business, schedule, phone, notificationsEnabled });
       setIsSaving(false);
     }, 1200);
   };
@@ -115,6 +119,39 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full bg-theme-bg/50 border-2 border-theme rounded-xl text-theme pl-12 pr-4 py-4 focus:border-green-500 outline-none font-bold placeholder:text-theme-muted/50"
               />
+            </div>
+          </section>
+
+          <section className="bg-theme-surface rounded-[3rem] border border-theme p-8 md:p-10 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="size-12 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500 border border-blue-500/20">
+                  <span className="material-symbols-outlined font-black">notifications_active</span>
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-theme italic tracking-tight">Alertas de Reservas</h2>
+                  <p className="text-xs text-theme-muted font-bold mt-1">Recibe notificaciones de escritorio al recibir nuevas citas</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if (!notificationsEnabled) {
+                    if ('Notification' in window) {
+                      Notification.requestPermission().then(perm => {
+                        if (perm === 'granted') setNotificationsEnabled(true);
+                        else alert('Debes permitir las notificaciones en tu navegador.');
+                      });
+                    } else {
+                      alert('Este navegador no soporta notificaciones de escritorio.');
+                    }
+                  } else {
+                    setNotificationsEnabled(false);
+                  }
+                }}
+                className={`w-14 h-8 rounded-full transition-colors relative ${notificationsEnabled ? 'bg-blue-500' : 'bg-theme-bg border border-theme'}`}
+              >
+                <div className={`absolute top-1 bottom-1 w-6 rounded-full transition-all shadow-md ${notificationsEnabled ? 'left-7 bg-white' : 'left-1 bg-theme border border-theme-muted'}`} />
+              </button>
             </div>
           </section>
 

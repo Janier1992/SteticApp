@@ -20,6 +20,7 @@ export interface User {
   allergies?: string[];
   loyaltyPoints?: number;
   additionalNotes?: string;
+  notificationsEnabled?: boolean;
   treatmentProgress?: {
     name: string;
     currentSession: number;
@@ -38,6 +39,7 @@ export interface Business {
   location: string;
   phone?: string;
   ownerId: string;
+  notificationsEnabled?: boolean;
   schedule?: {
     open: string;
     close: string;

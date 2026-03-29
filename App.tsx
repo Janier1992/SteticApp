@@ -264,6 +264,77 @@ const App: React.FC = () => {
     }
   };
 
+  // Background polling for notifications
+  useEffect(() => {
+    if (!currentUser) return;
+
+    let interval: ReturnType<typeof setInterval>;
+
+    if (currentUser.role === UserRole.ADMIN) {
+      const bizId = (currentBusiness as any)?.id;
+      if (!bizId) return;
+      
+      const notifsEnabled = currentBusiness?.notificationsEnabled ?? (localStorage.getItem(`stetic_admin_notifs_${bizId}`) === 'true');
+      if (!notifsEnabled) return;
+
+      interval = setInterval(async () => {
+        try {
+          const remoteApps = await InsforgeService.getAppointments(bizId);
+          if (remoteApps) {
+            setAppointments((prev) => {
+              const oldAppIds = new Set(prev.map(a => a.id));
+              const newApps = remoteApps.filter((a: any) => !oldAppIds.has(a.id) && a.status === 'PENDIENTE');
+              
+              if (newApps.length > 0) {
+                newApps.forEach((newApp: any) => {
+                  NotificationService.send("¡Nueva Reserva!", `Recibiste una nueva reserva para ${newApp.serviceName}.`);
+                });
+              }
+              // Only update if there are changes to avoid unnecessary re-renders
+              return remoteApps.length !== prev.length ? remoteApps : prev;
+            });
+          }
+        } catch (err) {
+          console.error("Admin polling error:", err);
+        }
+      }, 60000); // Poll every 60 seconds
+
+    } else if (currentUser.role === UserRole.CLIENT) {
+      const notifsEnabled = currentUser.notificationsEnabled ?? (localStorage.getItem(`stetic_client_notifs_${currentUser.id}`) === 'true');
+      if (!notifsEnabled) return;
+
+      interval = setInterval(() => {
+        setAppointments((prev) => {
+          const now = new Date().getTime();
+          const oneDayMs = 24 * 60 * 60 * 1000;
+          const twoHoursMs = 2 * 60 * 60 * 1000;
+
+          let shouldUpdate = false;
+          prev.forEach(app => {
+            if (app.clientId === currentUser.id && app.status === 'PENDIENTE') {
+              const appTime = new Date(app.startTime).getTime();
+              const timeDiff = appTime - now;
+              
+              const notified24hKey = `notified_24h_${app.id}`;
+              const notified2hKey = `notified_2h_${app.id}`;
+
+              if (timeDiff > 0 && timeDiff <= oneDayMs && !localStorage.getItem(notified24hKey)) {
+                NotificationService.send("Recordatorio de Cita", `Tienes una cita para ${app.serviceName} en menos de 24 horas.`);
+                localStorage.setItem(notified24hKey, 'true');
+              } else if (timeDiff > 0 && timeDiff <= twoHoursMs && !localStorage.getItem(notified2hKey)) {
+                NotificationService.send("Cita Próxima", `Tu cita para ${app.serviceName} es en menos de 2 horas. ¡No llegues tarde!`);
+                localStorage.setItem(notified2hKey, 'true');
+              }
+            }
+          });
+          return prev;
+        });
+      }, 60000); // Check every 60 seconds
+    }
+
+    return () => clearInterval(interval);
+  }, [currentUser, currentBusiness]);
+
   const renderContent = () => {
     if (view === 'landing') return <Landing onExploreServices={() => setView('public-gallery')} onRegisterBusiness={() => { setAuthPreferredRole(UserRole.ADMIN); setView('auth'); }} onLogin={(role) => { setAuthPreferredRole(role); setView('auth'); }} />;
     if (view === 'public-gallery' && !currentUser) return <PublicGallery onBack={() => setView('landing')} onBookService={() => { setAuthPreferredRole(UserRole.CLIENT); setView('auth'); }} />;

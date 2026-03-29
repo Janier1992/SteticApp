@@ -29,6 +29,9 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ currentUser, appointments
   const [notes, setNotes] = useState(currentUser.additionalNotes || '');
   const [isSaving, setIsSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(
+    currentUser.notificationsEnabled ?? (localStorage.getItem(`stetic_client_notifs_${currentUser.id}`) === 'true')
+  );
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [editForm, setEditForm] = useState({
     name: currentUser.name,
@@ -37,6 +40,25 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ currentUser, appointments
     hairType: currentUser.hairType || '',
     allergies: currentUser.allergies?.join(', ') || ''
   });
+
+  const handleToggleNotifications = async () => {
+    const newVal = !notificationsEnabled;
+    if (newVal) {
+      if ('Notification' in window) {
+        const perm = await Notification.requestPermission();
+        if (perm !== 'granted') {
+          alert('Debes permitir las notificaciones en tu navegador.');
+          return;
+        }
+      } else {
+        alert('Este navegador no soporta notificaciones de escritorio.');
+        return;
+      }
+    }
+    setNotificationsEnabled(newVal);
+    localStorage.setItem(`stetic_client_notifs_${currentUser.id}`, newVal.toString());
+    onUpdateUser({ ...currentUser, notificationsEnabled: newVal });
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -314,6 +336,42 @@ const ClientProfile: React.FC<ClientProfileProps> = ({ currentUser, appointments
                 onBlur={e => { e.currentTarget.style.borderColor = 'var(--color-input-border)'; handleSaveNotes(); }}
               />
               <p style={{ fontSize: '11px', color: 'var(--color-text-faint)', marginTop: '8px' }}>Se guarda automáticamente al salir del campo.</p>
+            </div>
+
+            {/* Preferences */}
+            <div style={sectionCard}>
+              <p className="section-label flex items-center gap-2 mb-4">
+                <span className="material-symbols-outlined text-sm" style={{ color: 'var(--color-primary)' }}>settings</span>
+                Preferencias
+              </p>
+              <div className="flex items-center justify-between p-3 rounded-lg" style={{ background: 'var(--color-surface-low)', border: '1px solid var(--color-border)' }}>
+                <div className="flex items-center gap-3">
+                  <span className="material-symbols-outlined text-xl" style={{ color: notificationsEnabled ? 'var(--color-primary)' : 'var(--color-text-faint)' }}>
+                    {notificationsEnabled ? 'notifications_active' : 'notifications_off'}
+                  </span>
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--color-text)' }}>Recordatorios</p>
+                    <p className="text-[11px]" style={{ color: 'var(--color-text-faint)' }}>Recibir alertas de citas próximas</p>
+                  </div>
+                </div>
+                <button
+                  onClick={handleToggleNotifications}
+                  style={{
+                    width: '44px', height: '24px', borderRadius: '12px',
+                    background: notificationsEnabled ? 'var(--color-primary)' : 'var(--color-surface-mid)',
+                    border: `1px solid ${notificationsEnabled ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                    position: 'relative', transition: 'all 0.2s', cursor: 'pointer'
+                  }}
+                >
+                  <div style={{
+                    position: 'absolute', top: '2px', 
+                    left: notificationsEnabled ? '22px' : '2px', 
+                    width: '18px', height: '18px', 
+                    background: '#fff', borderRadius: '50%', transition: 'all 0.2s',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+                  }} />
+                </button>
+              </div>
             </div>
           </div>
 
