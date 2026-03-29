@@ -5,9 +5,12 @@ import { Appointment } from "../types";
 const getApiKey = () => {
   try {
     const b64 = import.meta.env.VITE_GEMINI_API_KEY_B64;
-    return b64 ? atob(b64) : '';
+    if (b64) return atob(b64);
+    const plain = import.meta.env.VITE_GEMINI_API_KEY;
+    if (plain) return plain;
+    return '';
   } catch {
-    return ''; // Evita crasheos si la variable no existe o no es un base64 válido
+    return import.meta.env.VITE_GEMINI_API_KEY || ''; // Fallback si b64 falla
   }
 };
 const createAIClient = () => new GoogleGenerativeAI(getApiKey());

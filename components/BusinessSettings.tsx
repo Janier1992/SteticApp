@@ -15,6 +15,7 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
     days: ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
     breaks: []
   });
+  const [phone, setPhone] = useState(business.phone || '');
 
   const [isSaving, setIsSaving] = useState(false);
   const [showBreakForm, setShowBreakForm] = useState(false);
@@ -50,7 +51,7 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
     setIsSaving(true);
     // Simulación de persistencia y actualización del estado global
     setTimeout(() => {
-      onSave({ ...business, schedule });
+      onSave({ ...business, schedule, phone });
       setIsSaving(false);
     }, 1200);
   };
@@ -94,6 +95,29 @@ const BusinessSettings: React.FC<BusinessSettingsProps> = ({ business, onSave })
         
         {/* PANEL IZQUIERDO: DÍAS Y HORAS GENERALES */}
         <div className="xl:col-span-7 space-y-8">
+          
+          <section className="bg-theme-surface rounded-[3rem] border border-theme p-8 md:p-10 shadow-2xl">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="size-12 rounded-xl bg-green-500/10 flex items-center justify-center text-green-500 border border-green-500/20">
+                <span className="material-symbols-outlined font-black">support_agent</span>
+              </div>
+              <div>
+                <h2 className="text-2xl font-black text-theme italic tracking-tight">Contacto WhatsApp</h2>
+                <p className="text-xs text-theme-muted font-bold mt-1">Número para confirmación de reservas</p>
+              </div>
+            </div>
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-theme-muted text-lg">call</span>
+              <input 
+                type="text" 
+                placeholder="+1234567890"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full bg-theme-bg/50 border-2 border-theme rounded-xl text-theme pl-12 pr-4 py-4 focus:border-green-500 outline-none font-bold placeholder:text-theme-muted/50"
+              />
+            </div>
+          </section>
+
           <section className="bg-theme-surface rounded-[3rem] border border-theme p-8 md:p-10 shadow-2xl">
             <div className="flex items-center gap-4 mb-10">
               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">

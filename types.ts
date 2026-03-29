@@ -36,6 +36,7 @@ export interface Business {
   reviewCount: number;
   image: string;
   location: string;
+  phone?: string;
   ownerId: string;
   schedule?: {
     open: string;

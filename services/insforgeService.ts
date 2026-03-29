@@ -119,6 +119,7 @@ export const InsforgeService = {
         description: business.description,
         category: business.category,
         location: business.location,
+        phone: business.phone,
       })
       .select()
       .single();
@@ -136,6 +137,7 @@ export const InsforgeService = {
         location: updates.location,
         image: updates.image,
         schedule: (updates as any).schedule,
+        phone: updates.phone,
       })
       .eq('id', id);
     if (error) throw error;
@@ -257,23 +259,29 @@ export const InsforgeService = {
   },
 
   async createAppointment(appointment: Partial<Appointment>) {
+    const payload: any = {
+      business_id: appointment.businessId,
+      client_id: appointment.clientId,
+      client_name: appointment.clientName,
+      service_id: appointment.serviceId,
+      service_name: appointment.serviceName,
+      start_time: appointment.startTime,
+      end_time: appointment.endTime,
+      status: appointment.status || AppointmentStatus.PENDING,
+      notes: appointment.notes,
+      technical_notes: appointment.technicalNotes,
+      risk_of_no_show: appointment.riskOfNoShow || 0,
+      price: appointment.price || 0,
+    };
+    
+    // Only attach staff_id if strictly provided, to avoid 'invalid input syntax for type uuid: "null"' or FK errors.
+    if (appointment.staffId) {
+      payload.staff_id = appointment.staffId;
+    }
+
     const { data, error } = await insforge.database
       .from('stetic_appointments')
-      .insert({
-        business_id: appointment.businessId,
-        client_id: appointment.clientId,
-        client_name: appointment.clientName,
-        service_id: appointment.serviceId,
-        service_name: appointment.serviceName,
-        staff_id: appointment.staffId,
-        start_time: appointment.startTime,
-        end_time: appointment.endTime,
-        status: appointment.status || AppointmentStatus.PENDING,
-        notes: appointment.notes,
-        technical_notes: appointment.technicalNotes,
-        risk_of_no_show: appointment.riskOfNoShow || 0,
-        price: appointment.price || 0,
-      })
+      .insert(payload)
       .select()
       .single();
 
